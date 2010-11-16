@@ -1,8 +1,9 @@
-package zhen.ds;
+package zhen.ds.server;
 
-public class Product {
+public class Item {
 	private String name;
 	private String price;
+	private String productID;
 	private String currentPrice;
 	private int timeLeft;
 
