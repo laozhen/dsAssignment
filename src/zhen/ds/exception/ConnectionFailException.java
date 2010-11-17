@@ -1,4 +1,4 @@
-package zhen.ds.server.exception;
+package zhen.ds.exception;
 
 @SuppressWarnings("serial")
 public class ConnectionFailException extends Exception{

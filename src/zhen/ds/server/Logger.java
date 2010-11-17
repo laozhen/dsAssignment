@@ -3,15 +3,15 @@ package zhen.ds.server;
 import java.io.PrintStream;
 
 public class Logger {
-	PrintStream out= System.out;
-	public void debug()
+	static PrintStream out= System.out;
+	public static void debug(String msg)
 	{
-		
+		out.println("[DEBUG] "+msg);
 	}
 	
-	public void error()
+	public static void error(String msg)
 	{
-		out.println("error at")
+		out.println("[ERROR] "+msg);
 	}
 
 }

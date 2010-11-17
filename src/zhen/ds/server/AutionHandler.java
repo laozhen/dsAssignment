@@ -5,30 +5,39 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import zhen.ds.server.exception.*;
-public class AutionHandler implements Runnable{
+import zhen.ds.exception.*;
+public class AutionHandler extends Thread{
 	
 	Socket socket=null;
 	InputStream in=null;
 	OutputStream out =null;
 	PrintWriter pwt = null;
 	BufferedReader brd = null;
-	ItemManager pManager = ItemManager.getProductManager();
-	public AutionHandler (Socket socket)
+	ItemManager iManager = ItemManager.getItemManager();
+	public AutionHandler (Socket socket)throws Exception
 	{
-		
+		this.socket=socket;
+		checkConnection();
 	}
 	
 	
 	public void run()
 	{
-		checkConnection();
-		requestLogin();
-		initList();
+		Logger.debug("thread running");
+		try {
+			requestLogin();
+			initList();
+		}catch (LoginFailException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InitListFailException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
-	private void checkConnection() throws Exception
+	private void checkConnection() throws ConnectionFailException
 	{
 		if(socket==null)
 		{
@@ -38,7 +47,7 @@ public class AutionHandler implements Runnable{
 		{
 			in = socket.getInputStream();
 			out=socket.getOutputStream();
-			pwt = new PrintWriter(out);
+			pwt = new PrintWriter(out,true);
 			brd = new BufferedReader(new InputStreamReader(in));
 		}
 		catch (IOException ex)
@@ -48,10 +57,17 @@ public class AutionHandler implements Runnable{
 		}
 	}
 	
-	private void requestLogin() throws Exception
+	private void requestLogin() throws LoginFailException
 	{
 		pwt.println("WELCOME,WHAT'S YOUR NAME");
-		String name= brd.readLine();
+		String name;
+		try {
+			name = brd.readLine();
+			Logger.debug("getName "+name);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new LoginFailException("unable read from the client");
+		}
 		if(name.matches("[a-zA-Z].*"))
 		{
 			
@@ -60,20 +76,33 @@ public class AutionHandler implements Runnable{
 		{
 			throw new LoginFailException("iligel name");
 		}
+		Logger.debug("request login finish");
 	}
 	
-	private void initList()throws Exception
+	private void initList()throws InitListFailException
 	{
 		pwt.println("INIT LIST");
-		String r = brd.readLine();
+		String r;
+		try {
+			r = brd.readLine();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new InitListFailException("unable read from the client");
+		}
 		if(r.equals("READY"))
 		{
-			ArrayList<Item> plist = pManager.getProductList();
+			ArrayList<Item> plist = iManager.getItemList();
 			synchronized (plist)
 			{
-				ObjectOutputStream oos = new ObjectOutputStream (out);
-				oos.writeObject(plist);
-				r = brd.readLine();
+				try {
+					ObjectOutputStream oos = new ObjectOutputStream (out);
+					oos.writeObject(plist);
+					oos.flush();
+					r = "SUCCESS";
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					throw new InitListFailException("unable to write object to client");
+				}
 				if(! r.equals("SUCCESS"))
 				{
 					throw new InitListFailException("not receiving SUCCESS from client");

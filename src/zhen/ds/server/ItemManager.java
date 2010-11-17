@@ -5,29 +5,30 @@ import java.util.List;
 
 public class ItemManager {
 
-	static ItemManager p = null;
-	ArrayList<Item> plist = new ArrayList<Item>();
+	static ItemManager i = null;
+	ArrayList<Item> iList = new ArrayList<Item>();
 	private ItemManager()
 	{
 	}
 	
 	
-	public static ItemManager getProductManager ()
+	public static ItemManager getItemManager ()
 	{
-		if(p==null)
+		if(i==null)
 		{
-			p = new ItemManager();
+			i = new ItemManager();
 		}
-		return p;
+		return i;
 	}
 	
 	
-	public void addProduct(Item p)
+	public void addItem(Item item)
 	{
+		iList.add(item);
 		
 	}
-	public ArrayList<Item> getProductList()
+	public ArrayList<Item> getItemList()
 	{
-		return plist;
+		return iList;
 	}
 }
