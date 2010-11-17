@@ -9,7 +9,7 @@ public class ItemManager {
 
 	static ItemManager i = null;
 	ArrayList<Item> iList = new ArrayList<Item>();
-	static Item currentItem;
+	 ServerItem currentItem;
 	private ItemManager()
 	{
 	}
@@ -24,13 +24,13 @@ public class ItemManager {
 		return i;
 	}
 	
-	public static Item getCurrentItem()
+	public   ServerItem getCurrentItem()
 	{
 		return currentItem;
 	}
 	
 	
-	public void addItem(Item item)
+	public void addItem(ServerItem item)
 	{
 		iList.add(item);
 		currentItem=item;

@@ -5,7 +5,7 @@ import java.io.*;
 
 import zhen.ds.exception.*;
 import zhen.ds.server.Logger;
-import zhen.ds.share.Item;
+import zhen.ds.share.*;
 
 public class AutionHandler {
 	Socket socket = null;
@@ -14,8 +14,9 @@ public class AutionHandler {
 	BufferedReader brd;
 	PrintWriter pwt;
 	String name;
-	ObjectInputStream ois=null;
-	ObjectOutputStream oos=null;
+	Item currentItem =null;
+	ObjectInputStream ois ;
+	ObjectOutputStream oos;
 	public AutionHandler (Socket s,String name) throws ConnectionFailException, IOException
 	{
 		System.out.print("create something");
@@ -24,6 +25,8 @@ public class AutionHandler {
 		try {
 			in=s.getInputStream();
 			out=s.getOutputStream();
+			ois = new ObjectInputStream(in);
+			oos= new ObjectOutputStream(out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,6 +47,7 @@ public class AutionHandler {
 		{
 			Logger.debug("sent name");
 			pwt.println(name);
+			pwt.flush();
 		}
 	}
 	
@@ -99,9 +103,9 @@ public class AutionHandler {
 		
 		pwt.println("UPDATE ITEM");
 		pwt.flush();
+		Logger.debug("sent update item message");
 		try {
 			Logger.debug("read item");
-			ois = new ObjectInputStream(in);
 			Item item = (Item)ois.readObject();
 			//TODO mighit be a problem
 			pwt.println("SUCCESS");
@@ -115,6 +119,22 @@ public class AutionHandler {
 			e.printStackTrace();
 		}
 		return null;
+		
+	}
+	
+	public AuctionCMD auction(int newPrice,Item item) throws AuctionException, ClassNotFoundException
+	{
+		pwt.println("AUCTION");
+		AuctionCMD  ac = new AuctionCMD(item.getItemID(),newPrice);
+		try {
+			oos.writeObject(ac);
+			AuctionCMD result =(AuctionCMD) ois.readObject();
+			return result;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new AuctionException("");
+		}
 		
 	}
 

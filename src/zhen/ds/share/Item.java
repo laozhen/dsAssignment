@@ -8,8 +8,11 @@ public class Item  implements Serializable{
 	protected String itemID;
 	protected int currentPrice;
 	protected int timeLeft;
-	protected int state;
+	protected State state;
 	protected String highestBidder;
+	
+	
+	public enum State {BEFORE_START,OK,BEFORE_END,END}
 	
 	public Item(String name, int price, String productID,
 			int currentPrice, int timeLeft) {
@@ -18,6 +21,7 @@ public class Item  implements Serializable{
 		this.price = price;
 		this.itemID = productID;
 		this.currentPrice = currentPrice;
+		this.state=State.BEFORE_START;
 		this.timeLeft = timeLeft;
 	}
 
@@ -41,7 +45,7 @@ public class Item  implements Serializable{
 		return timeLeft;
 	}
 
-	public int getState() {
+	public State getState() {
 		return state;
 	}
 

@@ -27,7 +27,7 @@ public class ServerItem extends zhen.ds.share.Item{
 		this.timeLeft = timeLeft;
 	}
 
-	public void setState(int state) {
+	public void setState(State state) {
 		this.state = state;
 	}
 

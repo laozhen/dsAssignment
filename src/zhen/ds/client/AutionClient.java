@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import zhen.ds.server.Logger;
+import zhen.ds.share.AuctionCMD;
 import zhen.ds.share.Item;
 
 public class AutionClient {
@@ -15,8 +16,9 @@ public class AutionClient {
 		Socket s = new Socket(addr,8889);
 		AutionHandler ah = new AutionHandler(s,"name");
 		ah.login();
-		Item i =ah.updateItem();
-		Logger.debug("name of the item is "+i.getName());
+		Item i =ah.updateItem(); 
+		AuctionCMD ac =ah.auction(30, i);
+		Logger.debug(ac.getResult()+" "+ac.getReason());
 		
 		
 	}
