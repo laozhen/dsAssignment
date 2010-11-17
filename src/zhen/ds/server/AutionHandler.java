@@ -124,8 +124,8 @@ public class AutionHandler extends Thread {
 						"fail to read success message from client");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new UpdateListException("output stream error");
 		}
 	}
 

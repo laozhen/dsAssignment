@@ -12,6 +12,7 @@ public class AutionClient {
 	
 	public static void main (String[] args) throws Throwable
 	{
+		/*
 		InetAddress addr = InetAddress.getLocalHost();
 		Socket s = new Socket(addr,8889);
 		AutionHandler ah = new AutionHandler(s,"name");
@@ -19,6 +20,9 @@ public class AutionClient {
 		Item i =ah.updateItem(); 
 		AuctionCMD ac =ah.auction(30, i);
 		Logger.debug(ac.getResult()+" "+ac.getReason());
+		*/
+		
+		ClientFrame frame = new ClientFrame();
 		
 		
 	}
