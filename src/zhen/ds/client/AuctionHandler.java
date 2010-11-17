@@ -7,7 +7,7 @@ import zhen.ds.exception.*;
 import zhen.ds.server.Logger;
 import zhen.ds.share.*;
 
-public class AutionHandler {
+public class AuctionHandler {
 	Socket socket = null;
 	OutputStream out;
 	InputStream in;
@@ -17,7 +17,7 @@ public class AutionHandler {
 	Item currentItem =null;
 	ObjectInputStream ois ;
 	ObjectOutputStream oos;
-	public AutionHandler (Socket s,String name) throws ConnectionFailException, IOException
+	public AuctionHandler (Socket s,String name) throws ConnectionFailException, IOException
 	{
 		System.out.print("create something");
 		this.socket =s;
@@ -25,6 +25,7 @@ public class AutionHandler {
 		try {
 			in=s.getInputStream();
 			out=s.getOutputStream();
+			Logger.debug("got input stream");
 			ois = new ObjectInputStream(in);
 			oos= new ObjectOutputStream(out);
 		} catch (IOException e) {
@@ -34,6 +35,7 @@ public class AutionHandler {
 		}
 		brd=  new BufferedReader(new InputStreamReader(in));
 		pwt = new PrintWriter(out,true);
+		login();
 		
 	}
 	
@@ -107,7 +109,6 @@ public class AutionHandler {
 		try {
 			Logger.debug("read item");
 			Item item = (Item)ois.readObject();
-			//TODO mighit be a problem
 			pwt.println("SUCCESS");
 			Logger.debug("success");
 			return item;
