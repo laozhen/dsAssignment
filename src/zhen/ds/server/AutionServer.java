@@ -1,6 +1,8 @@
 package zhen.ds.server;
 import java.net.*;
 
+import zhen.ds.share.Item;
+
 public class AutionServer  {
 	
 	//hello world

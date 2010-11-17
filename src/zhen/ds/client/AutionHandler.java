@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.io.*;
 
 import zhen.ds.exception.*;
-import zhen.ds.server.Item;
 import zhen.ds.server.Logger;
+import zhen.ds.share.Item;
 
 public class AutionHandler {
 	Socket socket = null;
@@ -14,9 +14,11 @@ public class AutionHandler {
 	BufferedReader brd;
 	PrintWriter pwt;
 	String name;
-	public AutionHandler (Socket s,String name) throws ConnectionFailException
+	ObjectInputStream ois=null;
+	ObjectOutputStream oos=null;
+	public AutionHandler (Socket s,String name) throws ConnectionFailException, IOException
 	{
-		System.out.print("create staff");
+		System.out.print("create something");
 		this.socket =s;
 		this.name=name;
 		try {
@@ -35,6 +37,7 @@ public class AutionHandler {
 	
 	public void login() throws IOException
 	{
+		Logger.debug("ready to login");
 		String welcome=brd.readLine();
 		Logger.debug("read from server "+welcome);
 		if(welcome.equals("WELCOME,WHAT'S YOUR NAME"))
@@ -44,7 +47,10 @@ public class AutionHandler {
 		}
 	}
 	
-	public void initList()throws InitListFailException
+	
+	/**
+	
+	public ArrayList<Item> initAutionItem()throws InitListFailException
 	{
 		String msg;
 		try {
@@ -60,14 +66,16 @@ public class AutionHandler {
 			pwt.println("READY");
 			Logger.debug("READY sent");
 			try {
-				ObjectInputStream ois = new ObjectInputStream(in);
+				ois = new ObjectInputStream(in);
 				@SuppressWarnings("unchecked")
-				ArrayList<Item> iList =(ArrayList<Item>)ois.readObject();
+				ArrayList<Item> iList=(ArrayList<Item>)ois.readObject();
 				Logger.debug("read object finish");
+				ois.close();
 				for(Item i : iList)
 				{
 					Logger.debug("item i is " + i.getName());
 				}
+				pwt.println("SUCCESS");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -76,6 +84,38 @@ public class AutionHandler {
 				e.printStackTrace();
 			}
 		}
+		else
+		{
+			throw new InitListFailException("fail to get init list command from the server");
+		}
+		return null;
+	}
+	
+	**/
+	
+	public Item updateItem()
+	{
+		
+		
+		pwt.println("UPDATE ITEM");
+		pwt.flush();
+		try {
+			Logger.debug("read item");
+			ois = new ObjectInputStream(in);
+			Item item = (Item)ois.readObject();
+			//TODO mighit be a problem
+			pwt.println("SUCCESS");
+			Logger.debug("success");
+			return item;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 
 }

@@ -1,4 +1,4 @@
-package zhen.ds.server;
+package zhen.ds.share;
 
 import java.io.Serializable;
 
@@ -9,6 +9,7 @@ public class Item  implements Serializable{
 	protected int currentPrice;
 	protected int timeLeft;
 	protected int state;
+	protected String highestBidder;
 	
 	public Item(String name, int price, String productID,
 			int currentPrice, int timeLeft) {
@@ -43,8 +44,9 @@ public class Item  implements Serializable{
 	public int getState() {
 		return state;
 	}
-	
-	
 
+	public String getHighestBidder() {
+		return highestBidder;
+	}
 	
 }

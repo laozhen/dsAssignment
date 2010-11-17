@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import zhen.ds.exception.*;
+import zhen.ds.share.Item;
 public class AutionHandler extends Thread{
 	
 	Socket socket=null;
@@ -26,13 +27,13 @@ public class AutionHandler extends Thread{
 		Logger.debug("thread running");
 		try {
 			requestLogin();
-			initList();
+			autionLoop();
 		}catch (LoginFailException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InitListFailException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception ex)
+		{
+			
 		}
 		
 	}
@@ -79,6 +80,8 @@ public class AutionHandler extends Thread{
 		Logger.debug("request login finish");
 	}
 	
+	
+	/**
 	private void initList()throws InitListFailException
 	{
 		pwt.println("INIT LIST");
@@ -91,14 +94,13 @@ public class AutionHandler extends Thread{
 		}
 		if(r.equals("READY"))
 		{
-			ArrayList<Item> plist = iManager.getItemList();
-			synchronized (plist)
+			Item item = iManager.getCurrentItem();
+			synchronized (item)
 			{
 				try {
-					ObjectOutputStream oos = new ObjectOutputStream (out);
-					oos.writeObject(plist);
+					oos.writeObject(item);
 					oos.flush();
-					r = "SUCCESS";
+					r = brd.readLine();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					throw new InitListFailException("unable to write object to client");
@@ -114,8 +116,45 @@ public class AutionHandler extends Thread{
 			throw new InitListFailException("not receiving READY from client");
 		}
 	}
+	**/
 	
-	private void autionLoop()throws Exception
+	private void autionLoop()throws UpdateListException,IOException
+	{
+		while(true)
+		{
+			Logger.debug("aution loop");
+		String cmd=brd.readLine();
+		Logger.debug("get something from client "+cmd);
+		if(cmd.equals("UPDATE ITEM"))
+		{
+			Logger.debug("update item");
+			updateItem();
+		}
+		if(cmd =="AUCTION CMD")
+		{
+			Logger.debug("aution command");
+		}
+		}
+	}
+	private void updateItem()throws UpdateListException
+	{
+		try {
+			Logger.debug("sending item");
+			ObjectOutputStream oos = new ObjectOutputStream(out);
+			Item i = iManager.getCurrentItem();
+			oos.writeObject(i);
+			oos.flush();
+			String msg =brd.readLine();
+			if(!msg.equals("SUCCESS"))
+			{
+				throw new UpdateListException("fail to read success message from client");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void auction()throws AuctionException
 	{
 		
 	}
