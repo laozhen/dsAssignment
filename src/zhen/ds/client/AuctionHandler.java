@@ -138,5 +138,25 @@ public class AuctionHandler {
 		}
 		
 	}
+	
+	public ArrayList<Item> updateClosedItems ()  
+	{
+		pwt.println("UPDATE CLOSED ITEM");
+		
+		
+		try {
+			ArrayList<Item> closedItems = (ArrayList<Item>) ois.readObject();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+		
+	}
 
 }

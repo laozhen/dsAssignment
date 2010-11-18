@@ -12,17 +12,16 @@ public class Item  implements Serializable{
 	protected String highestBidder;
 	
 	
-	public enum State {BEFORE_START,OK,BEFORE_END,END}
+	public static enum State {BEFORE_START,AUCTION,BEFORE_END,END}
 	
 	public Item(String name, int price, String productID,
-			int currentPrice, int timeLeft) {
+			int currentPrice) {
 		super();
 		this.name = name;
 		this.price = price;
 		this.itemID = productID;
 		this.currentPrice = currentPrice;
 		this.state=State.BEFORE_START;
-		this.timeLeft = timeLeft;
 	}
 
 	public String getName() {

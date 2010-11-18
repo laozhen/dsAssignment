@@ -1,10 +1,44 @@
 package zhen.ds.server;
 
-public class ServerItem extends zhen.ds.share.Item{
+import zhen.ds.share.Item;
+
+class ServerItem extends zhen.ds.share.Item{
+	
+	int reservePrice;
 	
 	public ServerItem(String name, int price, String productID, int currentPrice,
-			int timeLeft) {
-		super(name, price, productID, currentPrice, timeLeft);
+			int reservePrice) {
+		super(name, price, productID, currentPrice);
+		timeLeft = 20;
+		state = State.BEFORE_START;
+	}
+	
+	
+	
+	public void update ()
+	{
+		timeLeft --;
+		if(timeLeft<=0)
+		{
+			switch (state)
+			{
+			case BEFORE_START:
+				timeLeft=120;
+				state = State.AUCTION;
+				break;
+			case AUCTION:
+				timeLeft = 5;
+				state=State.BEFORE_END;
+				break;
+				
+			case BEFORE_END:
+				state = State.END;
+				break;
+			case END:
+				break;
+			
+			}
+		}
 	}
 
 	public void setName(String name) {

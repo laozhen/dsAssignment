@@ -15,23 +15,49 @@ import javax.swing.*;
 import zhen.ds.exception.ConnectionFailException;
 import zhen.ds.server.Logger;
 
-public class ClientFrame extends JFrame implements ActionListener {
+public class ClientFrame extends JFrame   {
 	
 	JButton start=new JButton("Connect to Server");
 	IpDialog ipDialog = new IpDialog(this);
 	JPanel main = new JPanel(new FlowLayout());
 	ItemPanel itemPanel ;
 	AuctionHandler ah ;
+	String host;
+	int port;
+	String username;
 	
-	public ClientFrame()
+	public ClientFrame(String host,int port,String username) throws ConnectionFailException
 	{
+		
+		this.host=host;
+		this.port=port;
+		this.username=username;
+		
+		try {
+			 Socket socket = new Socket(InetAddress.getByName(host),port);
+			 ah = new AuctionHandler(socket, username);
+			 itemPanel = new ItemPanel(ah);
+			 initContentPane();
+		} catch (UnknownHostException e) {
+			throw new ConnectionFailException("host is invalid");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Logger.error("failure to connection host");
+		} catch (ConnectionFailException e) {
+			// TODO Auto-generated catch block
+			throw new ConnectionFailException("");
+		}
+		
 		setVisible(true);
 		setSize(500,400);
-		start.addActionListener(this);
-		main.add(start);
-		setContentPane(main);
+		initContentPane();
+		
+		
+		
 		
 	}
+	
+	/*
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
@@ -55,11 +81,10 @@ public class ClientFrame extends JFrame implements ActionListener {
 			e.printStackTrace();
 		}
 
-	}
+	}*/
 	
 	private void initContentPane()
 	{
-		main.remove(start);
 		main.setLayout(new GridLayout(3,1));
 		itemPanel.update();
 		main.add(itemPanel);

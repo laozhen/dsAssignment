@@ -110,7 +110,16 @@ public class AutionHandler extends Thread {
 				Logger.debug("aution command");
 				auction();
 			}
+			
+			if(cmd.equals("UPDATE CLOSED LIST"))
+			{
+				updateClosedList();
+			}
 		}
+	}
+
+	private void updateClosedList() {
+		
 	}
 
 	private void updateItem() throws UpdateListException {
@@ -140,7 +149,7 @@ public class AutionHandler extends Thread {
 
 			synchronized (item) {
 				boolean fail=false;
-				if(item.getState()!=Item.State.OK)
+				if(item.getState()!=Item.State.AUCTION)
 				{
 					fail=true;
 					reason="state not ready\n";
