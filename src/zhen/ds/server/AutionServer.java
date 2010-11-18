@@ -13,6 +13,7 @@ public class AutionServer  {
 		ItemManager i= ItemManager.getItemManager();
 		ServerItem item = new ServerItem("ItemName",29,"0001",13,200);
 		i.addItem(item);
+		i.startAuction();
 		Socket client = ss.accept();
 		Logger.debug("connected :"+client.toString());
 		AutionHandler ah = new AutionHandler(client);

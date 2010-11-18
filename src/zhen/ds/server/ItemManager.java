@@ -30,7 +30,7 @@ public class ItemManager implements ActionListener{
 		return i;
 	}
 
-	public ServerItem getCurrentItem() {
+	synchronized public ServerItem getCurrentItem() {
 		return currentItem;
 	}
 
@@ -54,19 +54,18 @@ public class ItemManager implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if(currentItem==null)
-		{
-			currentItem =open.getFirst();
-			open.removeFirst();
+		synchronized (currentItem) {
+			if (currentItem == null) {
+				currentItem = open.getFirst();
+				open.removeFirst();
+			}
+			if (currentItem.getState() == Item.State.END) {
+				closed.addLast(currentItem);
+				currentItem = open.getFirst();
+				open.removeFirst();
+			}
+			currentItem.update();
 		}
-		if(currentItem.getState()==Item.State.END)
-		{
-			closed.addLast(currentItem);
-			currentItem =open.getFirst();
-			open.removeFirst();
-		}
-		
-		currentItem.update();
 		
 	}
 }

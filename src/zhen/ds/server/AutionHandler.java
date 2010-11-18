@@ -85,7 +85,7 @@ public class AutionHandler extends Thread {
 	 * (Exception e) { // TODO Auto-generated catch block throw new
 	 * InitListFailException("unable read from the client"); }
 	 * if(r.equals("READY")) { Item item = iManager.getCurrentItem();
-	 * synchronized (item) { try { oos.writeObject(item); oos.flush(); r =
+	 * synchronized (item) { try { (item); oos.flush(); r =
 	 * brd.readLine(); } catch (IOException e) { // TODO Auto-generated catch
 	 * block throw new
 	 * InitListFailException("unable to write object to client"); } if(!
@@ -125,8 +125,10 @@ public class AutionHandler extends Thread {
 	private void updateItem() throws UpdateListException {
 		try {
 			Logger.debug("sending item");
-			Item i = iManager.getCurrentItem();
-			oos.writeObject(i);
+			Item item =(Item) iManager.getCurrentItem();
+			Logger.debug("item manager :"+item.getTimeLeft());
+			oos.writeUnshared(item);
+			oos.flush();
 			String msg = brd.readLine();
 			if (!msg.equals("SUCCESS")) {
 				throw new UpdateListException(
@@ -176,7 +178,7 @@ public class AutionHandler extends Thread {
 					ac.setResult("FAIL");
 					ac.setReason(reason);
 				}
-				oos.writeObject(ac);
+				oos.writeUnshared(ac);
 				Logger.debug("done write object");
 				
 			}

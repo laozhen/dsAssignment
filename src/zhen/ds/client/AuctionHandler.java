@@ -111,6 +111,7 @@ public class AuctionHandler {
 			Item item = (Item)ois.readObject();
 			pwt.println("SUCCESS");
 			Logger.debug("success");
+			Logger.debug("ac time left is "+item.getTimeLeft());
 			return item;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -128,7 +129,7 @@ public class AuctionHandler {
 		pwt.println("AUCTION");
 		AuctionCMD  ac = new AuctionCMD(item.getItemID(),newPrice);
 		try {
-			oos.writeObject(ac);
+			oos.writeUnshared(ac);
 			AuctionCMD result =(AuctionCMD) ois.readObject();
 			return result;
 		} catch (IOException e) {

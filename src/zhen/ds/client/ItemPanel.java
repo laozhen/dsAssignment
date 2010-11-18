@@ -1,7 +1,19 @@
 package zhen.ds.client;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.LayoutManager;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+
+import zhen.ds.server.Logger;
 import zhen.ds.share.Item;
 
 public class ItemPanel extends JPanel{
@@ -12,25 +24,38 @@ public class ItemPanel extends JPanel{
 	JLabel timeLeft = new JLabel("TimeLeft: ??");
 	JLabel highestBidder =new JLabel("HighestBidder: ??");
 	JLabel currentPrice =new JLabel("currentPrice: ??");
-	AuctionHandler ah;
+	;
 	
-	public ItemPanel(AuctionHandler ah)
+	public ItemPanel()
 	{
-		super(new FlowLayout());
-		this.ah=ah;
+		super();
+		setLayout(new GridLayout(1,8));
+		Border border = BorderFactory.createLineBorder(Color.black);
+		itemName.setBackground(Color.BLUE);
+		itemID.setBorder(border);
+		currentPrice.setBorder(border);
+		timeLeft.setBorder(border);
+		highestBidder.setBorder(border);
+	
 		add(itemName);
 		add(itemID);
 		add(currentPrice);
 		add(timeLeft);
 		add(highestBidder);
+		setBorder(BorderFactory.createLineBorder(Color.black));
+		
+	
 		
 		
 	}
-	public void update()
+	public void update(Item item)
 	{
-		item = ah.updateItem();
 		itemName.setText("ItemName: "+item.getName());
 		itemID.setText("ItemID: "+item.getItemID());
+		timeLeft.setText("Time Left:"+item.getTimeLeft());
+		repaint();
+		Logger.debug("time left is:"+item.getTimeLeft());
+		
 	}
 
 }
