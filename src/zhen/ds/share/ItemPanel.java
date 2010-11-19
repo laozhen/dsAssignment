@@ -53,5 +53,6 @@ public class ItemPanel extends JPanel{
 		
 	}
 //change in user 2
+//resue the changes
 
 }
