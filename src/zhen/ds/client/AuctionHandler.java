@@ -1,4 +1,5 @@
 package zhen.ds.client;
+
 import java.net.Socket;
 import java.util.ArrayList;
 import java.io.*;
@@ -14,137 +15,100 @@ public class AuctionHandler {
 	BufferedReader brd;
 	PrintWriter pwt;
 	String name;
-	Item currentItem =null;
-	ObjectInputStream ois ;
+	Item currentItem = null;
+	ObjectInputStream ois;
 	ObjectOutputStream oos;
-	public AuctionHandler (Socket s,String name) throws ConnectionFailException, IOException
-	{
+
+	public AuctionHandler(Socket s, String name)
+			throws ConnectionFailException, IOException {
 		System.out.print("create something");
-		this.socket =s;
-		this.name=name;
+		this.socket = s;
+		this.name = name;
 		try {
-			in=s.getInputStream();
-			out=s.getOutputStream();
+			in = s.getInputStream();
+			out = s.getOutputStream();
 			Logger.debug("got input stream");
 			ois = new ObjectInputStream(in);
-			oos= new ObjectOutputStream(out);
+			oos = new ObjectOutputStream(out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new ConnectionFailException("unable to open stream");
 		}
-		brd=  new BufferedReader(new InputStreamReader(in));
-		pwt = new PrintWriter(out,true);
+		brd = new BufferedReader(new InputStreamReader(in));
+		pwt = new PrintWriter(out, true);
 		login();
-		
+
 	}
-	
-	
-	public void login() throws IOException
-	{
+
+	public void login() throws IOException {
 		Logger.debug("ready to login");
-		String welcome=brd.readLine();
-		Logger.debug("read from server "+welcome);
-		if(welcome.equals("WELCOME,WHAT'S YOUR NAME"))
-		{
+		String welcome = brd.readLine();
+		Logger.debug("read from server " + welcome);
+		if (welcome.equals("WELCOME,WHAT'S YOUR NAME")) {
 			Logger.debug("sent name");
 			pwt.println(name);
 			pwt.flush();
 		}
-	}
-	
-	
-	/**
-	
-	public ArrayList<Item> initAutionItem()throws InitListFailException
-	{
-		String msg;
-		try {
-			msg = brd.readLine();
-			Logger.debug("read "+msg+" from server");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new InitListFailException("unable to read init list command from server");
-		}
-		if(msg.equals("INIT LIST"))
-		{
-			pwt.println("READY");
-			Logger.debug("READY sent");
-			try {
-				ois = new ObjectInputStream(in);
-				@SuppressWarnings("unchecked")
-				ArrayList<Item> iList=(ArrayList<Item>)ois.readObject();
-				Logger.debug("read object finish");
-				ois.close();
-				for(Item i : iList)
-				{
-					Logger.debug("item i is " + i.getName());
-				}
-				pwt.println("SUCCESS");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		else
 		{
-			throw new InitListFailException("fail to get init list command from the server");
+			socket.close();
+			in.close();
+			out.close();
+			Logger.error("auction is running or ended ,not able to login");
+			
 		}
-		return null;
 	}
-	
-	**/
-	
-	public Item updateItem()
-	{
-		
-		
+
+	public Item updateItem() throws AuctionEndedException, IOException {
+
 		pwt.println("UPDATE ITEM");
 		pwt.flush();
-		Logger.debug("sent update item message");
-		try {
-			Logger.debug("read item");
-			Item item = (Item)ois.readObject();
-			pwt.println("SUCCESS");
-			Logger.debug("success");
-			Logger.debug("ac time left is "+item.getTimeLeft());
-			return item;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String msg = brd.readLine();
+		if (msg.equals("AUCTION ENDED")) {
+			throw new AuctionEndedException("Auction ended");
+		} else {
+			Logger.debug("sent update item message");
+			if (msg.equals("READY")) {
+				try {
+					Logger.debug("read item");
+					Item item = (Item) ois.readObject();
+					pwt.println("SUCCESS");
+					Logger.debug("success");
+					Logger.debug("ac time left is " + item.getTimeLeft());
+					return item;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return null;
 		}
-		return null;
-		
+
 	}
-	
-	public AuctionCMD auction(int newPrice,Item item) throws AuctionException, ClassNotFoundException
-	{
+
+	public AuctionCMD auction(int newPrice, Item item) throws AuctionException,
+			ClassNotFoundException {
 		pwt.println("AUCTION");
-		AuctionCMD  ac = new AuctionCMD(item.getItemID(),newPrice);
+		AuctionCMD ac = new AuctionCMD(item.getItemID(), newPrice);
 		try {
 			oos.writeUnshared(ac);
-			AuctionCMD result =(AuctionCMD) ois.readObject();
+			AuctionCMD result = (AuctionCMD) ois.readObject();
 			return result;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new AuctionException("");
 		}
-		
+
 	}
-	
-	public ArrayList<Item> updateClosedItems ()  
-	{
+
+	public ArrayList<Item> updateClosedItems() {
 		pwt.println("UPDATE CLOSED ITEM");
-		
-		
+
 		try {
 			ArrayList<Item> closedItems = (ArrayList<Item>) ois.readObject();
 		} catch (IOException e) {
@@ -154,10 +118,9 @@ public class AuctionHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		return null;
-		
+
 	}
 
 }

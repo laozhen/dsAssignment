@@ -20,6 +20,10 @@ public class AutionHandler extends Thread {
 	ObjectInputStream ois = null;
 	String bidderID;
 
+	public static enum State {
+		NOT_START, WAITING, AUCTION, END
+	};
+
 	public AutionHandler(Socket socket) throws Exception {
 		this.socket = socket;
 		checkConnection();
@@ -60,8 +64,23 @@ public class AutionHandler extends Thread {
 	}
 
 	private void requestLogin() throws LoginFailException {
-		pwt.println("WELCOME,WHAT'S YOUR NAME");
-		pwt.flush();
+
+		if (iManager.getState() == ItemManager.State.WAITING) {
+			pwt.println("WELCOME,WHAT'S YOUR NAME");
+			pwt.flush();
+		} else {
+			pwt.println("AUCTION RUNNING OR ENDED");
+			pwt.flush();
+			
+			try {
+				socket.close();
+				out.close();
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		String bidderID;
 		try {
 			bidderID = brd.readLine();
@@ -85,9 +104,8 @@ public class AutionHandler extends Thread {
 	 * (Exception e) { // TODO Auto-generated catch block throw new
 	 * InitListFailException("unable read from the client"); }
 	 * if(r.equals("READY")) { Item item = iManager.getCurrentItem();
-	 * synchronized (item) { try { (item); oos.flush(); r =
-	 * brd.readLine(); } catch (IOException e) { // TODO Auto-generated catch
-	 * block throw new
+	 * synchronized (item) { try { (item); oos.flush(); r = brd.readLine(); }
+	 * catch (IOException e) { // TODO Auto-generated catch block throw new
 	 * InitListFailException("unable to write object to client"); } if(!
 	 * r.equals("SUCCESS")) { throw new
 	 * InitListFailException("not receiving SUCCESS from client"); } } } else {
@@ -110,29 +128,38 @@ public class AutionHandler extends Thread {
 				Logger.debug("aution command");
 				auction();
 			}
-			
-			if(cmd.equals("UPDATE CLOSED LIST"))
-			{
+
+			if (cmd.equals("UPDATE CLOSED LIST")) {
 				updateClosedList();
 			}
 		}
 	}
 
 	private void updateClosedList() {
-		
+
 	}
 
 	private void updateItem() throws UpdateListException {
 		try {
 			Logger.debug("sending item");
-			Item item =(Item) iManager.getCurrentItem();
-			Logger.debug("item manager :"+item.getTimeLeft());
-			oos.writeUnshared(item);
-			oos.flush();
-			String msg = brd.readLine();
-			if (!msg.equals("SUCCESS")) {
-				throw new UpdateListException(
-						"fail to read success message from client");
+			Item item = (Item) iManager.getCurrentItem();
+			Logger.debug("item manager :" + item.getTimeLeft());
+
+			// send the auction state
+			if (iManager.getState() == ItemManager.State.END) {
+				Logger.debug("send auction end message");
+				pwt.println("AUCTION ENDED");
+				pwt.flush();
+			} else {
+				pwt.println("READY");
+				pwt.flush();
+				oos.writeUnshared(item);
+				oos.flush();
+				String msg = brd.readLine();
+				if (!msg.equals("SUCCESS")) {
+					throw new UpdateListException(
+							"fail to read success message from client");
+			}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -141,46 +168,39 @@ public class AutionHandler extends Thread {
 	}
 
 	private void auction() throws AuctionException {
-		
+
 		try {
 			Logger.debug("reading something");
 			AuctionCMD ac = (AuctionCMD) ois.readObject();
 			Logger.debug("finished");
 			ServerItem item = iManager.getCurrentItem();
-			String reason="";
+			String reason = "";
 
 			synchronized (item) {
-				boolean fail=false;
-				if(item.getState()!=Item.State.AUCTION)
-				{
-					fail=true;
-					reason="state not ready\n";
+				boolean fail = false;
+				if (item.getState() != Item.State.AUCTION) {
+					fail = true;
+					reason = "state not ready\n";
 				}
-				if(item.getPrice()>=ac.getPrice())
-				{
-					fail=true;
-					reason+="price not high enough\n";
+				if (item.getPrice() >= ac.getPrice()) {
+					fail = true;
+					reason += "price not high enough\n";
 				}
-				if(!item.getItemID().equals(ac.getItemID()))
-				{
-					fail=true;
-					reason +="item not match\n";
+				if (!item.getItemID().equals(ac.getItemID())) {
+					fail = true;
+					reason += "item not match\n";
 				}
-				if(fail==false)
-				{
+				if (fail == false) {
 					item.setPrice(ac.getPrice());
 					item.setHighestBidder(bidderID);
 					ac.setResult("OK");
 					ac.setReason(reason);
-				}
-				else
-				{
+				} else {
 					ac.setResult("FAIL");
 					ac.setReason(reason);
 				}
 				oos.writeUnshared(ac);
 				Logger.debug("done write object");
-				
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

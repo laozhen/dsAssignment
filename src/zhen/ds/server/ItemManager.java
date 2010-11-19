@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 
 import zhen.ds.server.ItemManager.State;
+import zhen.ds.share.AuctionCMD;
 import zhen.ds.share.Item;
 import javax.swing.Timer;
 
@@ -16,7 +17,7 @@ public class ItemManager implements ActionListener{
 	ServerItem currentItem;
 	State state = State.NOT_START;
 	Timer timer = new Timer(1000,this);
-	public enum State {
+	public static enum State {
 		NOT_START, WAITING, AUCTION, END
 	};
 
@@ -46,10 +47,26 @@ public class ItemManager implements ActionListener{
 
 	public void startAuction() {
 		timer.start();
+		state = State.WAITING;
+		currentItem =  open.getFirst();
+		open.removeFirst();
 	}
 
 	public void pauseAuction() {
 		timer.stop();
+	}
+	
+	
+	
+	
+	
+	public State getState() {
+		return state;
+	}
+
+	public void doAuction(AuctionCMD ac)
+	{
+		
 	}
 
 	@Override

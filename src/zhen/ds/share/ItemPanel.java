@@ -1,4 +1,4 @@
-package zhen.ds.client;
+package zhen.ds.share;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -14,7 +14,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import zhen.ds.server.Logger;
-import zhen.ds.share.Item;
 
 public class ItemPanel extends JPanel{
 	Item item;
@@ -43,10 +42,6 @@ public class ItemPanel extends JPanel{
 		add(timeLeft);
 		add(highestBidder);
 		setBorder(BorderFactory.createLineBorder(Color.black));
-		
-	
-		
-		
 	}
 	public void update(Item item)
 	{

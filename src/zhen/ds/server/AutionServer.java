@@ -18,8 +18,6 @@ public class AutionServer  {
 		Logger.debug("connected :"+client.toString());
 		AutionHandler ah = new AutionHandler(client);
 		ah.start();
-		
-		
 	}
 
 }

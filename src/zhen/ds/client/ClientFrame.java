@@ -13,9 +13,11 @@ import java.net.UnknownHostException;
 
 import javax.swing.*;
 
+import zhen.ds.exception.AuctionEndedException;
 import zhen.ds.exception.ConnectionFailException;
 import zhen.ds.server.Logger;
 import zhen.ds.share.Item;
+import zhen.ds.share.ItemPanel;
 
 public class ClientFrame extends JFrame implements ActionListener {
 
@@ -78,32 +80,57 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 */
 
 	private void initContentPane() {
-		price.setHorizontalAlignment(JTextField.RIGHT);
-		price.setEditable(false);
-		price.setText("155");
-		main.setLayout(new FlowLayout());
-		itemPanel.update(ah.updateItem());
-		main.add(itemPanel);
-		main.add(Box.createHorizontalStrut(3000));
-		main.add(yourBid);
-		main.add(price);
-		main.add(bid);
-		main.add(Box.createHorizontalStrut(3000));
-		this.setContentPane(main);
-		this.repaint();
-		timer.start();
+		
+		try {
+			Item item = ah.updateItem();
+
+			
+			price.setHorizontalAlignment(JTextField.RIGHT);
+			price.setEditable(false);
+			price.setText("155");
+			main.setLayout(new FlowLayout());
+			itemPanel.update(item);
+			main.add(itemPanel);
+			main.add(Box.createHorizontalStrut(3000));
+			main.add(yourBid);
+			main.add(price);
+			main.add(bid);
+			main.add(Box.createHorizontalStrut(3000));
+			this.setContentPane(main);
+			this.repaint();
+			timer.start();
+		} catch (AuctionEndedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally 
+		{
+			Logger.debug("exit??");
+			System.exit(1);
+		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		Item item = ah.updateItem();
-		itemPanel.update(item);
-		if (item.getState() != Item.State.AUCTION) {
-			bid.setEnabled(false);
-		} else {
-			bid.setEnabled(true);
+		try {
+			Item item = ah.updateItem();
+			itemPanel.update(item);
+			if (item.getState() != Item.State.AUCTION) {
+				bid.setEnabled(false);
+			} else {
+				bid.setEnabled(true);
+			}
+			this.repaint();
+		} catch (AuctionEndedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		this.repaint();
 
 	}
 
